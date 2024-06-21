@@ -38,4 +38,5 @@
     {"text": "The weather is crazy these days. Its been {quantity} for days", "unit": "degree Celsius"},
     {"text": "It sure is warm outside. Almost {quantity}", "unit": "degree Celsius"},
     {"text": "The last days were freezingly cold. It's {quantity} now!", "unit": "degree Celsius"}
-	]
+
+]

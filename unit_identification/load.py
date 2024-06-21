@@ -1,44 +1,96 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-"""
-:mod:`Unit_Identification` unit and entity loading functions.
-"""
-
 import json
 from collections import defaultdict
 from pathlib import Path
 from typing import Any, List, Tuple, Union
-
 from . import classes as c
 from . import language
-
 TOPDIR = Path(__file__).parent or Path(".")
-
-###############################################################################
-_CACHE_DICT = {}
-
-
+_CACHE_DICT = defaultdict(dict)
+def clear_caches():
+    clear_units_cache()
+    clear_entities_cache()
+    clear_cache()
+def reset_quantities():
+    global USE_GENERAL_UNITS, USE_GENERAL_ENTITIES, USE_LANGUAGE_UNITS, USE_LANGUAGE_ENTITIES, USE_CUSTOM_UNITS, USE_CUSTOM_ENTITIES, USE_ADDITIONAL_UNITS, USE_ADDITIONAL_ENTITIES
+    USE_GENERAL_UNITS = True
+    USE_GENERAL_ENTITIES = True
+    USE_LANGUAGE_UNITS = True
+    USE_LANGUAGE_ENTITIES = True
+    USE_CUSTOM_UNITS = False
+    USE_CUSTOM_ENTITIES = False
+    USE_ADDITIONAL_UNITS = True
+    USE_ADDITIONAL_ENTITIES = True
+def clear_cache():
+    _CACHE_DICT.clear()
+class CustomQuantities:
+    def __init__(
+        self,
+        custom_units: List[Union[str, Path]] = None,
+        custom_entities: List[Union[str, Path]] = None,
+        use_general_units: bool = False,
+        use_language_units: bool = False,
+        use_additional_units: bool = True,
+        use_general_entities: bool = False,
+        use_language_entities: bool = False,
+        use_additional_entities: bool = True,
+    ):
+        self.custom_units = custom_units
+        self.custom_entities = custom_entities
+        self.use_general_units = use_general_units
+        self.use_language_units = use_language_units
+        self.use_additional_units = use_additional_units
+        self.use_general_entities = use_general_entities
+        self.use_language_entities = use_language_entities
+        self.use_additional_entities = use_additional_entities
+    def __enter__(self):
+        self._record_current_state()
+        if self.custom_units:
+            load_custom_units(
+                self.custom_units,
+                use_general_units=self.use_general_units,
+                use_language_units=self.use_language_units,
+                use_additional_units=self.use_additional_units,
+            )
+        if self.custom_entities:
+            load_custom_entities(
+                self.custom_entities,
+                use_general_entities=self.use_general_entities,
+                use_language_entities=self.use_language_entities,
+                use_additional_entities=self.use_additional_entities,
+            )
+    def __exit__(self, exc_type, exc_value, exc_tb):
+        # reset flags
+        self._reset_state()
+    def _record_current_state(self):
+        self.previous_general_units = USE_GENERAL_UNITS
+        self.previous_general_entities = USE_GENERAL_ENTITIES
+        self.previous_language_units = USE_LANGUAGE_UNITS
+        self.previous_language_entities = USE_LANGUAGE_ENTITIES
+        self.previous_custom_units = USE_CUSTOM_UNITS
+        self.previous_custom_entities = USE_CUSTOM_ENTITIES
+        self.previous_additional_units = USE_ADDITIONAL_UNITS
+        self.previous_additional_entities = USE_ADDITIONAL_ENTITIES
+    def _reset_state(self):
+        global USE_GENERAL_UNITS, USE_GENERAL_ENTITIES, USE_LANGUAGE_UNITS, USE_LANGUAGE_ENTITIES, USE_CUSTOM_UNITS, USE_CUSTOM_ENTITIES, USE_ADDITIONAL_UNITS, USE_ADDITIONAL_ENTITIES
+        USE_GENERAL_UNITS = self.previous_general_units
+        USE_GENERAL_ENTITIES = self.previous_general_entities
+        USE_LANGUAGE_UNITS = self.previous_language_units
+        USE_LANGUAGE_ENTITIES = self.previous_language_entities
+        USE_CUSTOM_UNITS = self.previous_custom_units
+        USE_CUSTOM_ENTITIES = self.previous_custom_entities
+        USE_ADDITIONAL_UNITS = self.previous_additional_units
+        USE_ADDITIONAL_ENTITIES = self.previous_additional_entities
 def cached(funct):
-    """
-    Decorator for caching language specific data
-    :param funct: the method, dynamically responding to language. Only
-                  parameter is lang
-    :return: the method, dynamically responding to language but also caching
-             results
-    """
     assert callable(funct)
-
-    def cached_function(lang="en_US"):
+    def cached_function(*args, **kwargs):
+        args_hash = hash((args, frozenset(kwargs.items())))
         try:
-            return _CACHE_DICT[id(funct)][lang]
+            return _CACHE_DICT[id(funct)][args_hash]
         except KeyError:
-            result = funct(lang)
-            _CACHE_DICT[id(funct)] = {lang: result}
+            result = funct(*args, **kwargs)
+            _CACHE_DICT[id(funct)].update({args_hash: result})
             return result
-
     return cached_function
-
-
 def object_pairs_hook_defer_duplicate_keys(object_pairs: List[Tuple[str, Any]]):
     keys = [x[0] for x in object_pairs]
     try:
@@ -50,26 +102,19 @@ def object_pairs_hook_defer_duplicate_keys(object_pairs: List[Tuple[str, Any]]):
             )
         )
     return dict(object_pairs)
-
-
-###############################################################################
 @cached
 def _get_load(lang="en_US"):
     return language.get("load", lang)
-
-
 GENERAL_UNITS_PATH = TOPDIR.joinpath("units.json")
+USE_GENERAL_UNITS = True
 GENERAL_ENTITIES_PATH = TOPDIR.joinpath("entities.json")
-
-
+USE_GENERAL_ENTITIES = True
 def LANGUAGE_ENTITIES_PATH(lang="en_US"):
     return TOPDIR.joinpath(language.topdir(lang), "entities.json")
-
-
 def LANGUAGE_UNITS_PATH(lang="en_US"):
     return TOPDIR.joinpath(language.topdir(lang), "units.json")
-
-
+USE_LANGUAGE_UNITS = True
+USE_LANGUAGE_ENTITIES = True
 def _load_json(path_or_string: Union[Path, str]):
     if isinstance(path_or_string, Path):
         with path_or_string.open("r", encoding="utf-8") as jsonfile:
@@ -78,8 +123,6 @@ def _load_json(path_or_string: Union[Path, str]):
         with open(path_or_string, "r", encoding="utf-8") as jsonfile:
             return jsonfile.read()
     return path_or_string
-
-
 def _load_json_dict(path_or_string: Union[Path, str, dict]):
     if isinstance(path_or_string, dict):
         return path_or_string
@@ -87,39 +130,27 @@ def _load_json_dict(path_or_string: Union[Path, str, dict]):
         _load_json(path_or_string),
         object_pairs_hook=object_pairs_hook_defer_duplicate_keys,
     )
-
-
 CUSTOM_ENTITIES = defaultdict(dict)
+USE_CUSTOM_ENTITIES = True
+ADDITIONAL_ENTITIES = defaultdict(dict)
+USE_ADDITIONAL_ENTITIES = True
 CUSTOM_UNITS = defaultdict(dict)
-
-###############################################################################
+USE_CUSTOM_UNITS = True
+ADDITIONAL_UNITS = defaultdict(dict)
+USE_ADDITIONAL_UNITS = True
 def to_int_iff_int(value):
-    """
-    Returns int type number if the value is an integer value
-    :param value:
-    :return:
-    """
     try:
         if int(value) == value:
             return int(value)
     except (TypeError, ValueError):
         pass
     return value
-
-
 def pluralize(singular, count=None, lang="en_US"):
-    # Make spelling integers more natural
     count = to_int_iff_int(count)
     return _get_load(lang).pluralize(singular, count)
-
-
 def number_to_words(count, lang="en_US"):
-    # Make spelling integers more natural
     count = to_int_iff_int(count)
     return _get_load(lang).number_to_words(count)
-
-
-###############################################################################
 METRIC_PREFIXES = {
     "Y": "yotta",
     "Z": "zetta",
@@ -150,30 +181,14 @@ METRIC_PREFIXES = {
     "Zi": "zebi",
     "Yi": "yobi",
 }
-
-
-###############################################################################
 def get_key_from_dimensions(derived):
-    """
-    Translate dimensionality into key for DERIVED_UNI and DERIVED_ENT dicts.
-    """
-
     return tuple((i["base"], i["power"]) for i in derived)
-
-
-###############################################################################
 class Entities(object):
     def __init__(self, entity_dicts: List[Union[Path, str, dict]]):
-        """
-        Load entities from JSON file.
-        """
-
-        # Merge entity dictionarys
         all_entities = defaultdict(dict)
         for ed in entity_dicts:
             for new_name, new_ent in _load_json_dict(ed).items():
                 all_entities[new_name].update(new_ent)
-
         self.names = dict(
             (
                 name,
@@ -185,8 +200,6 @@ class Entities(object):
             )
             for name, props in all_entities.items()
         )
-
-        # Generate derived units
         derived_ent = defaultdict(set)
         for entity in self.names.values():
             if not entity.dimensions:
@@ -195,14 +208,10 @@ class Entities(object):
             for perm in perms:
                 key = get_key_from_dimensions(perm)
                 derived_ent[key].add(entity)
-
         self.derived = derived_ent
-
+    def __getitem__(self, item):
+        return self.names[item]
     def get_dimension_permutations(self, derived):
-        """
-        Get all possible dimensional definitions for an entity.
-        """
-
         new_derived = defaultdict(int)
         for item in derived:
             new = self.names[item["base"]].dimensions
@@ -211,39 +220,45 @@ class Entities(object):
                     new_derived[new_item["base"]] += new_item["power"] * item["power"]
             else:
                 new_derived[item["base"]] += item["power"]
-
         final = [
             [{"base": i[0], "power": i[1]} for i in list(new_derived.items())],
             derived,
         ]
         final = [sorted(i, key=lambda x: x["base"]) for i in final]
-
         candidates = []
         for item in final:
             if item not in candidates:
                 candidates.append(item)
-
         return candidates
-
-
-@cached
-def entities(lang="en_US"):
-    """
-    Cached entity object
-    """
-    return Entities(
-        [GENERAL_ENTITIES_PATH, LANGUAGE_ENTITIES_PATH(lang), CUSTOM_ENTITIES]
+_CACHED_ENTITIES = {}
+def clear_entities_cache():
+    _CACHED_ENTITIES.clear()
+def entities(
+    lang: str = "en_US",
+) -> Entities:
+    args_hash = hash(
+        (
+            lang,
+            USE_GENERAL_ENTITIES,
+            USE_LANGUAGE_ENTITIES,
+            USE_ADDITIONAL_ENTITIES,
+            USE_CUSTOM_ENTITIES,
+        )
     )
-
-
-###############################################################################
+    if args_hash not in _CACHED_ENTITIES:
+        entities_list = []
+        if USE_GENERAL_ENTITIES:
+            entities_list.append(GENERAL_ENTITIES_PATH)
+        if USE_LANGUAGE_ENTITIES:
+            entities_list.append(LANGUAGE_ENTITIES_PATH(lang))
+        if USE_ADDITIONAL_ENTITIES:
+            entities_list.append(ADDITIONAL_ENTITIES)
+        if USE_CUSTOM_ENTITIES:
+            entities_list.extend(CUSTOM_ENTITIES)
+        _CACHED_ENTITIES[args_hash] = Entities(entities_list)
+    return _CACHED_ENTITIES[args_hash]
 def get_derived_units(names):
-    """
-    Create dictionary of unit dimensions.
-    """
-
     derived_uni = {}
-
     for name in names:
         key = get_key_from_dimensions(names[name].dimensions)
         derived_uni[key] = names[name]
@@ -256,80 +271,59 @@ def get_derived_units(names):
             {"base": names[i["base"]].name, "power": i["power"]}
             for i in names[name].dimensions
         ]
-
     return derived_uni
-
-
-###############################################################################
 class Units(object):
     def __init__(self, unit_dict_json: List[Union[str, Path, dict]], lang="en_US"):
-        """
-        Load units from JSON file.
-        """
-
-        # names of all units
         self.names = {}
         self.symbols, self.symbols_lower = defaultdict(set), defaultdict(set)
         self.surfaces, self.surfaces_lower = defaultdict(set), defaultdict(set)
         self.prefix_symbols = defaultdict(set)
         self.lang = lang
-
         unit_dict = defaultdict(dict)
         for ud in unit_dict_json:
             for name, unit in _load_json_dict(ud).items():
                 for nname, nunit in self.prefixed_units(name, unit):
                     unit_dict[nname].update(nunit)
-
         for name, unit in unit_dict.items():
             self.load_unit(name, unit)
-
         self.derived = get_derived_units(self.names)
-
-        # symbols of all units
         self.symbols_all = self.symbols.copy()
         self.symbols_all.update(self.symbols_lower)
-
-        # surfaces of all units
         self.surfaces_all = self.surfaces.copy()
         self.surfaces_all.update(self.surfaces_lower)
-
+    def __getitem__(self, name):
+        return self.names[name]
     def load_unit(self, name, unit):
         try:
             assert name not in self.names
-        except AssertionError:  # pragma: no cover
+        except AssertionError:
             msg = "Two units with same name in units.json: %s" % name
             raise Exception(msg)
-
         obj = c.Unit(
             name=name,
             surfaces=unit.get("surfaces", []),
-            entity=entities().names[unit["entity"]],
+            entity=entities(self.lang).names[unit["entity"]],
             uri=unit.get("URI"),
             symbols=unit.get("symbols", []),
-            dimensions=unit.get("dimensions", []),			
-            currency_code=unit.get("currency_code"),													
+            dimensions=unit.get("dimensions", []),
+            currency_code=unit.get("currency_code"),
             lang=self.lang,
         )
-
         self.names[name] = obj
-
         for symbol in unit.get("symbols", []):
             self.symbols[symbol].add(obj)
             self.symbols_lower[symbol.lower()].add(obj)
             if unit["entity"] == "currency":
                 self.prefix_symbols[symbol].add(obj)
-
         for surface in unit.get("surfaces", []):
             self.surfaces[surface].add(obj)
             self.surfaces_lower[surface.lower()].add(obj)
             plural = pluralize(surface, lang=self.lang)
             self.surfaces[plural].add(obj)
             self.surfaces_lower[plural.lower()].add(obj)
-
     @staticmethod
     def prefixed_units(name, unit):
         yield name, unit
-        # If SI-prefixes are given, add them
         for prefix in unit.get("prefixes", []):
             assert (
                 prefix in METRIC_PREFIXES
@@ -337,11 +331,8 @@ class Units(object):
             assert (
                 len(unit["dimensions"]) <= 1
             ), "Prefixing not supported for multiple dimensions in {}".format(name)
-
             uri = METRIC_PREFIXES[prefix].capitalize() + unit["URI"].lower()
-            # we usually do not want the "_(unit)" postfix for prefixed units
             uri = uri.replace("_(unit)", "")
-
             yield METRIC_PREFIXES[prefix] + name, {
                 "surfaces": [METRIC_PREFIXES[prefix] + i for i in unit["surfaces"]],
                 "entity": unit["entity"],
@@ -349,70 +340,81 @@ class Units(object):
                 "dimensions": [],
                 "symbols": [prefix + i for i in unit["symbols"]],
             }
-
-
-@cached
-def units(lang="en_US"):
-    """
-    Cached unit object
-    """
-    return Units([GENERAL_UNITS_PATH, LANGUAGE_UNITS_PATH(lang), CUSTOM_UNITS], lang)
-
-
-###############################################################################
+_CACHED_UNITS = {}
+def clear_units_cache():
+    _CACHED_UNITS.clear()
+def units(
+    lang: str = "en_US",
+) -> Units:
+    args_hash = hash(
+        (
+            lang,
+            USE_GENERAL_UNITS,
+            USE_LANGUAGE_UNITS,
+            USE_ADDITIONAL_UNITS,
+            USE_CUSTOM_UNITS,
+        )
+    )
+    if args_hash not in _CACHED_UNITS:
+        units_list = []
+        if USE_GENERAL_UNITS:
+            units_list.append(GENERAL_UNITS_PATH)
+        if USE_LANGUAGE_UNITS:
+            units_list.append(LANGUAGE_UNITS_PATH(lang))
+        if USE_ADDITIONAL_UNITS:
+            units_list.append(ADDITIONAL_UNITS)
+        if USE_CUSTOM_UNITS:
+            units_list.extend(CUSTOM_UNITS)
+        _CACHED_UNITS[args_hash] = Units(units_list, lang)
+    return _CACHED_UNITS[args_hash]
 @cached
 def training_set(lang="en_US"):
     training_set_ = []
-
     path = language.topdir(lang).joinpath("train")
     for file in path.iterdir():
         if file.suffix == ".json":
             with file.open("r", encoding="utf-8") as train_file:
                 training_set_ += json.load(train_file)
-
     return training_set_
-
-
-###############################################################################
 def add_custom_unit(name: str, **kwargs):
-    """
-    Adds a custom unit to the set of default units
-    Note: causes a reload of all units
-    :param name: Name of the unit to add, should preferably be unique,
-    otherwise will overwrite attributes in existing units
-    :param kwargs: properties of the unit as found in units.json, i.e. surfaces=["centimetre"]
-    """
-    CUSTOM_UNITS[name].update(kwargs)
-    _CACHE_DICT.clear()
-
-
+    ADDITIONAL_UNITS[name].update(kwargs)
+    clear_caches()
 def remove_custom_unit(name: str):
-    """
-    Removes a unit from the set of custom units
-    Note: causes a reload of all units
-    :param name: Name of the unit to remove. This will not affect units that are loaded per default.
-    """
-    CUSTOM_UNITS.pop(name)
-    _CACHE_DICT.clear()
-
-
+    ADDITIONAL_UNITS.pop(name)
+    clear_caches()
 def add_custom_entity(name: str, **kwargs):
-    """
-    Adds a custom entity to the set of default entities
-    Note: causes a reload of all entities
-    :param name: Name of the entity to add, should preferably be unique,
-    otherwise will overwrite attributes in existing entities
-    :param kwargs: properties of the entity as found in entities.json, i.e. surfaces=["centimetre"]
-    """
-    CUSTOM_ENTITIES[name].update(kwargs)
-    _CACHE_DICT.clear()
-
-
+    ADDITIONAL_ENTITIES[name].update(kwargs)
+    clear_caches()
 def remove_custom_entity(name: str):
-    """
-    Removes a entity from the set of custom entities
-    Note: causes a reload of all entities
-    :param name: Name of the entity to remove. This will not affect entities that are loaded per default.
-    """
-    CUSTOM_ENTITIES.pop(name)
-    _CACHE_DICT.clear()
+    ADDITIONAL_ENTITIES.pop(name)
+    clear_caches()
+def load_custom_units(
+    unit_dict_json: List[Union[str, Path]],
+    use_general_units: bool = False,
+    use_language_units: bool = False,
+    use_additional_units: bool = True,
+):
+    if not isinstance(unit_dict_json, list):
+        unit_dict_json = [unit_dict_json]
+    global USE_GENERAL_UNITS, USE_LANGUAGE_UNITS, USE_ADDITIONAL_UNITS, USE_CUSTOM_UNITS, CUSTOM_UNITS
+    USE_GENERAL_UNITS = use_general_units
+    USE_LANGUAGE_UNITS = use_language_units
+    USE_ADDITIONAL_UNITS = use_additional_units
+    USE_CUSTOM_UNITS = True
+    CUSTOM_UNITS = unit_dict_json
+    clear_units_cache()
+def load_custom_entities(
+    entity_dict_json: List[Union[str, Path]],
+    use_general_entities: bool = False,
+    use_language_entities: bool = False,
+    use_additional_entities: bool = True,
+):
+    if not isinstance(entity_dict_json, list):
+        entity_dict_json = [entity_dict_json]
+    global USE_GENERAL_ENTITIES, USE_LANGUAGE_ENTITIES, USE_ADDITIONAL_ENTITIES, USE_CUSTOM_ENTITIES, CUSTOM_ENTITIES
+    USE_GENERAL_ENTITIES = use_general_entities
+    USE_LANGUAGE_ENTITIES = use_language_entities
+    USE_ADDITIONAL_ENTITIES = use_additional_entities
+    USE_CUSTOM_ENTITIES = True
+    CUSTOM_ENTITIES = entity_dict_json
+    clear_entities_cache()
