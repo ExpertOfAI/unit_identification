@@ -1,12 +1,14 @@
 from setuptools import setup, find_packages
 
 setup(name='unit_identification',
-		version='1.0',
+		version='1.1',
 		description='UOM identification',
 		url='https://github.com/ExpertOfAI/unit_identification',
 		author='ExpertOfAI',
 		license='MIT',
 		packages=find_packages(),
+		data_files=[('', ['unit_identification/units.json', 'unit_identification/entities.json'])],
+		include_package_data=True,
 		classifiers=[
 		'Programming Language :: Python :: 3',
 		'License :: OSI Approved :: MIT License',
