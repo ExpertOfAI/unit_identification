@@ -1,0 +1,14 @@
+{
+  "dime": {
+    "symbols": [
+      "\u20ab",
+      "d"
+    ]
+  },
+  "terahertz": {
+    "URI": "Terahertz_(unit)"
+  },
+  "teraampere": {
+    "URI": "Ampere"
+  }
+}
