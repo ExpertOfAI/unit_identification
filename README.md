@@ -19,7 +19,7 @@ setup(name='unit_identification',
 pip install twine		
 python setup.py sdist
 
-delete tar.gz from dist folder
 twine upload dist/*
 <Enter API token , created from pypi account "create api token">
-pypi-AgEIcHlwaS5vcmcCJGQzZDc3NmQ4LTFhMTctNDYxOC05YWQ5LWNmYThhY2NiNGE5ZAACKlszLCJiN2ZkNTM4Ny00YTAzLTQwZWYtYTdhZS1lMjBhOWI2OTRlN2IiXQAABiAcgG04Ac5mG9mGO1LScd93dCKNfvU7LTiqvU0muSRW2A
+
+pypi-AgEIcHlwaS5vcmcCJDFkMTIzNjVlLThhMzEtNGUxOC1hYTJlLTcwY2Q3OTFhNDJjNAACKlszLCJiN2ZkNTM4Ny00YTAzLTQwZWYtYTdhZS1lMjBhOWI2OTRlN2IiXQAABiC9qTqlHpViAuKcQ64eivkUwSt1JBgC5F15Ta3hSrIg5w
