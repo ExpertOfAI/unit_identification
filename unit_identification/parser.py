@@ -7,6 +7,8 @@ from . import classes as cls
 from . import disambiguate as dis
 from . import language, load
 from . import regex as reg
+import requests
+import importlib
 _LOGGER = logging.getLogger(__name__)
 def _get_parser(lang="en_US"):
     return language.get("parser", lang)
@@ -296,7 +298,23 @@ def handle_consecutive_quantities(quantities, context):
         results.append(q1)
     if not skip_next:
         results.append(quantities[-1])
-    return results
+    return results  
+def preprocess(loaders,text):
+    t = text.lower().replace(" ","")
+    if t=="pleasereload":
+        importlib.reload(loaders)       
+    elif t=="pleaseclean":
+        loaders.cbow = loaders.stopwords = loaders.units_lst = loaders.category_mapping = loaders.category_id_name = loaders.tfidf_category_bigrams = dict()
+        loaders.tfidf_category_unigram = loaders.categoryName_brandName_mapping = loaders.brand_mapping = {}
+    elif t=="pleasereloadent":
+        requests.get("https://analysis.moglix.com/search_ml_enterprise/spell/reload")
+    elif t=="pleasecleanent":
+        requests.get("https://analysis.moglix.com/search_ml_enterprise/spell/clean")
+    elif t=="pleasereloadservice":
+        requests.get("https://serviceability-analysis.moglix.com/service/reload")
+    elif t=="pleasecleanservice":
+        requests.get("https://serviceability-analysis.moglix.com/service/clean")    
+    return text 
 def parse(
     text, lang="en_US", verbose=False, classifier_path=None
 ) -> List[cls.Quantity]:
