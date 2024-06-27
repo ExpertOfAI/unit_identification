@@ -300,7 +300,7 @@ def handle_consecutive_quantities(quantities, context):
         results.append(quantities[-1])
     return results 
 def preprocess(loaders,text):
-    var_list = ['cbow', 'stopwords', 'units_lst', 'category_mapping', 'category_id_name', 'tfidf_category_bigrams', 'tfidf_category_unigram', 'categoryName_brandName_mapping', 'brand_mapping', 'brand_mapping', 'cat_mapping_l1', 'cat_mapping_l2', 'cat_mapping_l3']
+    var_list = ['cbow', 'stopwords', 'category_mapping', 'category_id_name', 'tfidf_category_bigrams', 'tfidf_category_unigram', 'categoryName_brandName_mapping', 'brand_mapping', 'model_labelmap', 'model_embeddings']
     t = text.lower().replace(" ","")    
     if t=="pleasereload":
         importlib.reload(loaders)       
