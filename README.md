@@ -3,7 +3,7 @@ https://packaging.python.org/en/latest/tutorials/packaging-projects/
 from setuptools import setup, find_packages
 
 setup(name='unit_identification',
-		version='3.0',
+		version='3.2',
 		description='unit_identification',
 		url='https://github.com/ExpertOfAI/unit_identification',
 		author='ExpertOfAI',
@@ -21,5 +21,3 @@ python setup.py sdist
 
 twine upload dist/*
 <Enter API token , created from pypi account "create api token">
-
-pypi-AgEIcHlwaS5vcmcCJDFkMTIzNjVlLThhMzEtNGUxOC1hYTJlLTcwY2Q3OTFhNDJjNAACKlszLCJiN2ZkNTM4Ny00YTAzLTQwZWYtYTdhZS1lMjBhOWI2OTRlN2IiXQAABiC9qTqlHpViAuKcQ64eivkUwSt1JBgC5F15Ta3hSrIg5w
