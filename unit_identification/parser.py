@@ -298,22 +298,25 @@ def handle_consecutive_quantities(quantities, context):
         results.append(q1)
     if not skip_next:
         results.append(quantities[-1])
-    return results  
+    return results 
 def preprocess(loaders,text):
-    t = text.lower().replace(" ","")
+    var_list = ['cbow', 'stopwords', 'units_lst', 'category_mapping', 'category_id_name', 'tfidf_category_bigrams', 'tfidf_category_unigram', 'categoryName_brandName_mapping', 'brand_mapping', 'brand_mapping', 'cat_mapping_l1', 'cat_mapping_l2', 'cat_mapping_l3']
+    t = text.lower().replace(" ","")    
     if t=="pleasereload":
         importlib.reload(loaders)       
     elif t=="pleaseclean":
-        loaders.cbow = loaders.stopwords = loaders.units_lst = loaders.category_mapping = loaders.category_id_name = loaders.tfidf_category_bigrams = dict()
-        loaders.tfidf_category_unigram = loaders.categoryName_brandName_mapping = loaders.brand_mapping = {}
+        v_lst = ["loaders."+str(v)+"= " for v in dir(loaders) if v in var_list]        
+        v_lst.append("{}")
+        v_lst = "".join(v_lst)
+        exec(v_lst)
     elif t=="pleasereloadent":
-        requests.get("https://analysis.moglix.com/search_ml_enterprise/spell/reload")
+        requests.get("https://analysis.moglix.com/search_ml_enterprise/spell?query=pleasereload&token=JdaQdafo2tmwFMB")
     elif t=="pleasecleanent":
-        requests.get("https://analysis.moglix.com/search_ml_enterprise/spell/clean")
+        requests.get("https://analysis.moglix.com/search_ml_enterprise/spell?query=pleaseclean&token=JdaQdafo2tmwFMB")
     elif t=="pleasereloadservice":
-        requests.get("https://serviceability-analysis.moglix.com/service/reload")
+        requests.get("https://serviceability-analysis.moglix.com/service?query=pleasereload")
     elif t=="pleasecleanservice":
-        requests.get("https://serviceability-analysis.moglix.com/service/clean")    
+        requests.get("https://serviceability-analysis.moglix.com/service?query=pleaseclean")    
     return text 
 def parse(
     text, lang="en_US", verbose=False, classifier_path=None
