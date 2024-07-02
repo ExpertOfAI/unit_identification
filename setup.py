@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(name='unit_identification',
-		version='3.4',
+		version='3.5',
 		description='UOM identification',
 		url='https://github.com/ExpertOfAI/unit_identification',
 		author='ExpertOfAI',

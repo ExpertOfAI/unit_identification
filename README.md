@@ -3,7 +3,7 @@ https://packaging.python.org/en/latest/tutorials/packaging-projects/
 from setuptools import setup, find_packages
 
 setup(name='unit_identification',
-		version='3.4',
+		version='3.5',
 		description='unit_identification',
 		url='https://github.com/ExpertOfAI/unit_identification',
 		author='ExpertOfAI',
