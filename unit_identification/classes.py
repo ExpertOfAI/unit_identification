@@ -2,6 +2,7 @@ import json
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List, Optional, Tuple
 from . import speak
+k = b'lCLR3pMPtFwhe98mDWwkWtoaTViy5oiFQ_UzpFmG3ww='
 class JSONMIxin(ABC):
     @abstractmethod
     def to_dict(self):
