@@ -1,10 +1,10 @@
 from setuptools import setup, find_packages
 
-setup(name='unit_identification',
-		version='3.6',
-		description='UOM identification',
+setup(name='unit_identification_cpu',
+		version='1.0',
+		description='UOM identification_cpu',
 		url='https://github.com/ExpertOfAI/unit_identification',
-		author='ExpertOfAI',
+		author='ExpertOfAI1',
 		license='MIT',
 		packages=find_packages(),
 		data_files=[
