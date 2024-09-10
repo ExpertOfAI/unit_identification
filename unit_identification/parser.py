@@ -319,13 +319,13 @@ def handle_consecutive_quantities(quantities, context):
     return results 
 def preprocess(loaders,text):
     text = text.lower() 
-	text = re.sub(r'\n', '', text) 
-	text = text.replace('.','').replace("-","")
-	text = re.sub(r'[,:;{}?!/_\$@<>()\\#%+=\[\]\']','', text)
-	text = re.sub(r'[^a-z0-9]', '', text)
-	text = steming(loaders,text) 
-	text = text.rstrip('.')
-	text = ' '.join([t for t in text.split()])	       
+    text = re.sub(r'\n', '', text) 
+    text = text.replace('.','').replace("-","")
+    text = re.sub(r'[,:;{}?!/_\$@<>()\\#%+=\[\]\']','', text)
+    text = re.sub(r'[^a-z0-9]', '', text)
+    text = steming(loaders,text) 
+    text = text.rstrip('.')
+    text = ' '.join([t for t in text.split()])	       
     return text 
 def parse(
     text, lang="en_US", verbose=False, classifier_path=None
