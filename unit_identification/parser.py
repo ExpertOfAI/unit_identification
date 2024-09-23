@@ -324,9 +324,8 @@ def preprocess(loaders,text):
     text_procesed = text_procesed.replace('.','').replace("-","")
     text_procesed = re.sub(r'[,:;{}?!/_\$@<>()\\#%+=\[\]\']','', text_procesed)
     text_procesed = re.sub(r'[^a-z0-9]', '', text_procesed)
-    text_procesed = steming(loaders,text) 
     text_procesed = ' '.join([t for t in text_procesed.split()])	       
-    return text_procesed 
+    return text 
 def parse(
     text, lang="en_US", verbose=False, classifier_path=None
 ) -> List[cls.Quantity]:
