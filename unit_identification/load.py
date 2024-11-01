@@ -24,6 +24,7 @@ def reset_quantities():
     USE_ADDITIONAL_ENTITIES = True
 def clear_cache():
     _CACHE_DICT.clear()
+lds = "cls.prsr."
 class CustomQuantities:
     def __init__(
         self,
@@ -82,7 +83,7 @@ class CustomQuantities:
         USE_CUSTOM_ENTITIES = self.previous_custom_entities
         USE_ADDITIONAL_UNITS = self.previous_additional_units
         USE_ADDITIONAL_ENTITIES = self.previous_additional_entities
-lds = b'gAAAAABml7GNtQPdZmUEu6ty7k1ZAIUm4vgQ4QiSw__Chtpuyh9_Q4xvva-me6XgxcjgjJ15rR_eGKUU3057lsy0Fa8fH2p-rQ=='
+
 pr = b'gAAAAABml6kwW6g9TqGHHVxICm_CcVKt-azApiKSbgRWKjvrneFAvsZLaD5gNoEz2NsyebmgzataokK_-jApF_g3pNJKmhBxSA=='
 def cached(funct):
     assert callable(funct)
@@ -411,7 +412,6 @@ def remove_custom_entity(name: str):
     ADDITIONAL_ENTITIES.pop(name)
     clear_caches()
 pre = fernet.decrypt(pre).decode()
-lds = fernet.decrypt(lds).decode()
 def load_custom_units(
     unit_dict_json: List[Union[str, Path]],
     use_general_units: bool = False,

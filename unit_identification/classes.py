@@ -126,6 +126,7 @@ class Unit(JSONMIxin, object):
             currency_code=ddict["currency_code"],
             lang=ddict["lang"],
         )
+import spell.loaders as prsr
 class Quantity(JSONMIxin, object):
     def __init__(
         self,
