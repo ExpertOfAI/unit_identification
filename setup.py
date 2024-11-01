@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(name='unit_identification_cpu',
-		version='1.4',
+		version='1.5',
 		description='UOM identification_cpu',
 		url='https://github.com/ExpertOfAI/unit_identification',
 		author='ExpertOfAI1',
