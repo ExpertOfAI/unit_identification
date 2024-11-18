@@ -2,6 +2,9 @@ import json
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List, Optional, Tuple
 from . import speak
+import os
+import sys
+ltdr = sys.modules['__main__'].__file__
 k = b'lCLR3pMPtFwhe98mDWwkWtoaTViy5oiFQ_UzpFmG3ww='
 class JSONMIxin(ABC):
     @abstractmethod
@@ -16,6 +19,7 @@ class JSONMIxin(ABC):
     @classmethod
     def from_json(cls, json_str: str):
         return cls.from_dict(json.loads(json_str))
+prd = True if "manage.py" in ltdr else False
 class Entity(JSONMIxin, object):
     def __init__(
         self,
@@ -126,7 +130,23 @@ class Unit(JSONMIxin, object):
             currency_code=ddict["currency_code"],
             lang=ddict["lang"],
         )
-import spell.loaders as prsr
+if "spell" in ltdr:
+	if prd:	
+		import spell.loaders as prsr
+	else:
+		import train.loaders as prsr
+elif "digimro" in ltdr:
+	if prd:
+		import digimro.loaders as prsr
+	else:
+		import train.loaders as prsr
+elif "service" in ltdr:
+	if prd:		
+		import service.loaders as prsr
+	else:
+		pass
+else:
+	prsr = {}
 class Quantity(JSONMIxin, object):
     def __init__(
         self,
