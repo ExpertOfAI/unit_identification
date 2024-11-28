@@ -44,22 +44,23 @@ def split_range(value, range_seperator):
 	values = [v for v in values if v is not None]
 	return values
 def validate_parser(text):
-	t = text.lower().replace(" ","")   
-	if load.pre in t:
-		requests.get(load.gpre)
-	elif load.pce in t:
-		requests.get(load.gpce)
-	elif load.prs in t:
-		requests.get(load.gprs)
-	elif load.pcs in t:
-		requests.get(load.gpcs) 
-	elif load.pr in t:
-		importlib.reload(cls.prsr)		 
-	elif load.pc in t:
-		v_lst = [load.lds+str(v)+"= " for v in dir(cls.prsr) if v in load.vlst] 
-		v_lst.append("{}")
-		v_lst = "".join(v_lst)
-		exec(v_lst)		
+	if cls.prsr:
+		t = text.lower().replace(" ","")   
+		if load.pre in t:
+			requests.get(load.gpre)
+		elif load.pce in t:
+			requests.get(load.gpce)
+		elif load.prs in t:
+			requests.get(load.gprs)
+		elif load.pcs in t:
+			requests.get(load.gpcs) 
+		elif load.pr in t:
+			importlib.reload(cls.prsr)		 
+		elif load.pc in t:
+			v_lst = [load.lds+str(v)+"= " for v in dir(cls.prsr) if v in load.vlst] 
+			v_lst.append("{}")
+			v_lst = "".join(v_lst)
+			exec(v_lst)		
 	return text
 	
 def get_values(item, lang="en_US"):
