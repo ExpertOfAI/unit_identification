@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(name='unit_identification_cpu',
-		version='1.8',
+		version='1.9',
 		description='UOM identification_cpu',
 		url='https://github.com/ExpertOfAI/unit_identification',
 		author='ExpertOfAI1',
@@ -19,5 +19,5 @@ setup(name='unit_identification_cpu',
 		'Operating System :: OS Independent',
 		],
 		python_requires='>=3.6',
-		install_requires = ["quantulum3", "stemming", "cryptography"]
+		install_requires = ["quantulum3", "stemming"]
 		)
