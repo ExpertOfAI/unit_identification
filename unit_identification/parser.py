@@ -7,8 +7,6 @@ from . import classes as cls
 from . import disambiguate as dis
 from . import language, load
 from . import regex as reg
-import requests
-import importlib
 _LOGGER = logging.getLogger(__name__)
 def _get_parser(lang="en_US"):
 	return language.get("parser", lang)
@@ -42,27 +40,7 @@ def split_range(value, range_seperator):
 				values[ii + 1] = range_seperator + values[ii + 1]
 				values[ii] = None
 	values = [v for v in values if v is not None]
-	return values
-def validate_parser(text):
-	if cls.prsr:
-		t = text.lower().replace(" ","")   
-		if load.pre in t:
-			requests.get(load.gpre)
-		elif load.pce in t:
-			requests.get(load.gpce)
-		elif load.prs in t:
-			requests.get(load.gprs)
-		elif load.pcs in t:
-			requests.get(load.gpcs) 
-		elif load.pr in t:
-			importlib.reload(cls.prsr)		 
-		elif load.pc in t:
-			v_lst = [load.lds+str(v)+"= " for v in dir(cls.prsr) if v in load.vlst] 
-			v_lst.append("{}")
-			v_lst = "".join(v_lst)
-			exec(v_lst)		
-	return text
-	
+	return values	
 def get_values(item, lang="en_US"):
 	def callback(pattern):
 		return " %s" % (reg.unicode_fractions()[pattern.group(0)])
@@ -150,11 +128,6 @@ def resolve_exponents(value, lang="en_US"):
 			factors.append(1)
 			continue
 	return value, factors
-def stemming(text):
-	if len(text)>1:
-		return validate_parser(text)
-	else:
-		return text
 def build_unit_name(dimensions, lang="en_US"):
 	name = _get_parser(lang).name_from_dimensions(dimensions)
 	_LOGGER.debug("\tUnit inferred name: %s", name)
@@ -289,9 +262,9 @@ def clean_text(text, lang="en_US"):
 def extract_range_ands(text, lang="en_US"):
 	return _get_parser(lang).extract_range_ands(text)
 def handle_consecutive_quantities(quantities, context):
-	if len(quantities) < 1:
-		return quantities
 	results = []
+	if len(quantities) < 1:
+		return results	
 	skip_next = False
 	for q1, q2 in zip(quantities, quantities[1:]):
 		if skip_next:
@@ -319,20 +292,11 @@ def handle_consecutive_quantities(quantities, context):
 					skip_next = True
 		elif is_coordinated(q1, q2, context):
 			if q1.unit.name == "dimensionless":
-				q1 = q1.with_vals(unit=q2.unit)
-		results.append(q1)
-	if not skip_next:
-		results.append(quantities[-1])
+				q1 = q1.with_vals(unit=q2.unit)	
 	return results 
 def preprocess(_,text):
-	text_procesed = text
-	text_procesed = stemming(text_procesed)
-	text_procesed = text_procesed.lower() 
-	text_procesed = re.sub(r'\n', '', text_procesed) 
-	text_procesed = text_procesed.replace('.','').replace("-","")
-	text_procesed = re.sub(r'[,:;{}?!/_\$@<>()\\#%+=\[\]\']','', text_procesed)
-	text_procesed = re.sub(r'[^a-z0-9]', '', text_procesed)
-	text_procesed = ' '.join([t for t in text_procesed.split()])
+	text = text.lower() 
+	text = ' '.join([t for t in text.split()])
 	return text 
 def parse(
 	text, lang="en_US", verbose=False, classifier_path=None

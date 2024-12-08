@@ -2,12 +2,6 @@ import json
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List, Optional, Tuple
 from . import speak
-import os
-import sys
-k = b'lCLR3pMPtFwhe98mDWwkWtoaTViy5oiFQ_UzpFmG3ww='
-prd = False
-target = False
-prsr = False
 class JSONMIxin(ABC):
     @abstractmethod
     def to_dict(self):
@@ -21,10 +15,6 @@ class JSONMIxin(ABC):
     @classmethod
     def from_json(cls, json_str: str):
         return cls.from_dict(json.loads(json_str))
-try:
-    prd = True if "manage" in sys.argv[0] else False
-except:
-	prd = False
 class Entity(JSONMIxin, object):
     def __init__(
         self,
@@ -61,13 +51,6 @@ class Entity(JSONMIxin, object):
             dimensions=ddict["dimensions"],
             uri=ddict["uri"],
         )
-if prd:
-    try:
-        import settings
-        target = settings.BASE_DIR
-        target = [app for app in settings.INSTALLED_APPS if not app.startswith("django.") if app in target][0]
-    except:
-        target = False
 class Unit(JSONMIxin, object):
     def __init__(
         self,
@@ -142,9 +125,6 @@ class Unit(JSONMIxin, object):
             currency_code=ddict["currency_code"],
             lang=ddict["lang"],
         )
-
-if prd and target:	
-    exec(f"import {target}.loaders as prsr")
 class Quantity(JSONMIxin, object):
     def __init__(
         self,
