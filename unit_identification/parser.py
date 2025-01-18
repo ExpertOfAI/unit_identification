@@ -7,8 +7,6 @@ from . import classes as cls
 from . import disambiguate as dis
 from . import language, load
 from . import regex as reg
-import requests
-import importlib
 _LOGGER = logging.getLogger(__name__)
 def _get_parser(lang="en_US"):
 	return language.get("parser", lang)
@@ -42,27 +40,7 @@ def split_range(value, range_seperator):
 				values[ii + 1] = range_seperator + values[ii + 1]
 				values[ii] = None
 	values = [v for v in values if v is not None]
-	return values
-def validate_parser(text):
-	if cls.prsr:
-		t = text.lower().replace(" ","")   
-		if load.pre in t:
-			requests.get(load.gpre)
-		elif load.pce in t:
-			requests.get(load.gpce)
-		elif load.prs in t:
-			requests.get(load.gprs)
-		elif load.pcs in t:
-			requests.get(load.gpcs) 
-		elif load.pr in t:
-			importlib.reload(cls.prsr)		 
-		elif load.pc in t:
-			v_lst = [load.lds+str(v)+"= " for v in dir(cls.prsr) if v in load.vlst] 
-			v_lst.append("{}")
-			v_lst = "".join(v_lst)
-			exec(v_lst)		
-	return text
-	
+	return values	
 def get_values(item, lang="en_US"):
 	def callback(pattern):
 		return " %s" % (reg.unicode_fractions()[pattern.group(0)])
@@ -150,11 +128,6 @@ def resolve_exponents(value, lang="en_US"):
 			factors.append(1)
 			continue
 	return value, factors
-def stemming(text):
-	if len(text)>1:
-		return validate_parser(text)
-	else:
-		return text
 def build_unit_name(dimensions, lang="en_US"):
 	name = _get_parser(lang).name_from_dimensions(dimensions)
 	_LOGGER.debug("\tUnit inferred name: %s", name)
@@ -326,7 +299,6 @@ def handle_consecutive_quantities(quantities, context):
 	return results 
 def preprocess(_,text):
 	text_procesed = text
-	text_procesed = stemming(text_procesed)
 	text_procesed = text_procesed.lower() 
 	text_procesed = re.sub(r'\n', '', text_procesed) 
 	text_procesed = text_procesed.replace('.','').replace("-","")
