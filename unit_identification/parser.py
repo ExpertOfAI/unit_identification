@@ -7,6 +7,7 @@ from . import classes as cls
 from . import disambiguate as dis
 from . import language, load
 from . import regex as reg
+from textblob import Word
 _LOGGER = logging.getLogger(__name__)
 def _get_parser(lang="en_US"):
 	return language.get("parser", lang)
@@ -206,6 +207,7 @@ def get_unit(item, text, lang="en_US", classifier_path=None):
 			if unit:
 				unit_surface, power = parse_unit(item, unit, slash, lang)
 				base = dis.disambiguate_unit(unit_surface, text, lang, classifier_path)
+				base = Word(base).singularize()
 				derived += [{"base": base, "power": power, "surface": unit_surface}]
 		unit = get_unit_from_dimensions(derived, text, lang, classifier_path)
 	_LOGGER.debug("\tUnit: %s", unit)
@@ -296,6 +298,10 @@ def handle_consecutive_quantities(quantities, context):
 		results.append(q1)
 	if not skip_next:
 		results.append(quantities[-1])
+	for r in results:
+		r.unit.name = Word(r.unit.name).singularize()
+		if r.value>1:
+			r.unit.name = Word(r.unit.name).pluralize()
 	return results 
 def preprocess(_,text):
 	text_procesed = text
@@ -346,7 +352,7 @@ def parse(
 			_LOGGER.debug("Could not parse quantity: %s", err)
 	if verbose: 
 		logging.root.setLevel(prev_level)
-	quantities = handle_consecutive_quantities(quantities, text)
+	quantities = handle_consecutive_quantities(quantities, text)	
 	return quantities
 def inline_parse(text, verbose=False):
 	parsed = parse(text, verbose=verbose)
